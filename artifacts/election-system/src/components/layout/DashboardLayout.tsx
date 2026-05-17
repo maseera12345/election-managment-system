@@ -15,7 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, FileText, Settings, Bell, Archive, Vote, StopCircle, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Settings, Bell, Archive, Vote, LogOut, ClipboardList } from "lucide-react";
 import { useLogout } from "@workspace/api-client-react";
 import { toast } from "sonner";
 
@@ -38,12 +38,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const superAdminNav = [
     { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-    { title: "Requests", url: "/admin/requests", icon: FileText },
-    { title: "Elections", url: "/admin/elections", icon: Archive },
+    { title: "All Elections", url: "/admin/elections", icon: Archive },
     { title: "Users", url: "/admin/users", icon: Users },
-    { title: "Audit Logs", url: "/admin/audit-logs", icon: FileText },
-    { title: "Notifications", url: "/admin/notifications", icon: Bell },
-    { title: "Settings", url: "/admin/settings", icon: Settings },
+    { title: "Audit Logs", url: "/admin/audit-logs", icon: ClipboardList },
   ];
 
   const creatorNav = [
@@ -55,7 +52,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const voterNav = [
     { title: "Dashboard", url: "/voter", icon: LayoutDashboard },
     { title: "Browse Elections", url: "/voter/elections", icon: Archive },
-    { title: "My Participations", url: "/voter/my-participations", icon: Vote },
   ];
 
   const navItems = role === "super_admin" ? superAdminNav : role === "election_creator" ? creatorNav : voterNav;

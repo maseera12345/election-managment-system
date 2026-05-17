@@ -1,5 +1,5 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { useGetElection, useListCandidates } from "@workspace/api-client-react";
+import { useGetElection, useListCandidates, getGetElectionQueryKey, getListCandidatesQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useRoute } from "wouter";
@@ -11,11 +11,11 @@ export default function ElectionDetail() {
   const electionId = params?.id ? parseInt(params.id, 10) : 0;
 
   const { data: election, isLoading: isLoadingElection } = useGetElection(electionId, {
-    query: { enabled: !!electionId }
+    query: { queryKey: getGetElectionQueryKey(electionId), enabled: !!electionId }
   });
   
   const { data: candidates, isLoading: isLoadingCandidates } = useListCandidates(electionId, {
-    query: { enabled: !!electionId }
+    query: { queryKey: getListCandidatesQueryKey(electionId), enabled: !!electionId }
   });
 
   if (isLoadingElection || isLoadingCandidates) {

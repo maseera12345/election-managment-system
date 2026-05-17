@@ -145,6 +145,38 @@ router.get("/elections/:electionId/secret-ids", requireAuth, async (req: Authent
   }
 });
 
+// GET /api/elections/:electionId/my-secret-id (voter gets their own secret ID)
+router.get("/elections/:electionId/my-secret-id", requireAuth, async (req: AuthenticatedRequest, res) => {
+  try {
+    const electionId = Number(req.params.electionId);
+    const userId = req.user!.id;
+
+    const voters = await db.select().from(votersTable)
+      .where(and(eq(votersTable.electionId, electionId), eq(votersTable.userId, userId)))
+      .limit(1);
+
+    if (!voters.length) {
+      res.status(404).json({ error: "You are not registered for this election" });
+      return;
+    }
+
+    const voter = voters[0];
+    const secretIds = await db.select().from(secretIdsTable)
+      .where(and(eq(secretIdsTable.voterId, voter.id), eq(secretIdsTable.electionId, electionId)))
+      .limit(1);
+
+    if (!secretIds.length) {
+      res.json({ voter: { id: voter.id, status: voter.status, hasVoted: voter.hasVoted }, secretId: null });
+      return;
+    }
+
+    res.json({ voter: { id: voter.id, status: voter.status, hasVoted: voter.hasVoted }, secretId: secretIds[0].secretId, isUsed: secretIds[0].isUsed });
+  } catch (err) {
+    req.log.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // POST /api/elections/:electionId/secret-ids (generate)
 router.post("/elections/:electionId/secret-ids", requireAuth, async (req: AuthenticatedRequest, res) => {
   try {

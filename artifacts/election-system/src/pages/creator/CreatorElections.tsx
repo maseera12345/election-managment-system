@@ -58,7 +58,10 @@ export default function CreatorElections() {
                 </CardContent>
                 <CardFooter className="pt-4 border-t gap-2 flex-wrap">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/creator/elections/${election.id}/candidates`}>Manage</Link>
+                    <Link href={`/creator/elections/${election.id}/candidates`}>Candidates</Link>
+                  </Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/creator/elections/${election.id}/voters`}>Voters</Link>
                   </Button>
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/creator/elections/${election.id}/results`}>Results</Link>

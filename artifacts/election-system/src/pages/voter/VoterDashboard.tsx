@@ -89,9 +89,9 @@ export default function VoterDashboard() {
                   </p>
                 </CardContent>
                 <CardFooter className="pt-4 border-t">
-                  {participation.election.status === "active" && participation.voter.status === "approved" && !participation.voter.hasVoted ? (
+                  {participation.election.status === "active" && (participation.voter.status === "approved" || participation.voter.status === "finalized") && !participation.voter.hasVoted ? (
                     <Button asChild className="w-full">
-                      <Link href={`/voter/elections/${participation.election.id}/vote`}>Cast Vote</Link>
+                      <Link href={`/voter/elections/${participation.election.id}/join`}>Vote Now</Link>
                     </Button>
                   ) : participation.election.status === "completed" ? (
                     <Button variant="outline" asChild className="w-full">
