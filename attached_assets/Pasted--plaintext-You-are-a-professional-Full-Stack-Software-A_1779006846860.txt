@@ -1,0 +1,628 @@
+```plaintext
+You are a professional Full Stack Software Architect and UI/UX Designer.
+
+Create a complete modern “Secure Online Election Management System” using:
+
+Frontend:
+- React.js
+- Tailwind CSS
+- React Router DOM
+- Context API or Redux Toolkit
+- Recharts or Chart.js
+
+Backend:
+- Supabase
+(Auth + PostgreSQL Database + Row Level Security + Storage + Realtime)
+
+The system must have:
+- Modern responsive UI
+- Role-based dashboards
+- Authentication
+- Election management
+- Candidate management
+- Voting system
+- Live results
+- Security
+- Audit logs
+- Email notifications
+
+==================================================
+COMPLETE SYSTEM ARCHITECTURE
+==================================================
+
+There are 3 roles in the system:
+
+1. Super Admin
+2. Election Creator
+3. Voter/User
+
+Each role must have:
+- Separate dashboard
+- Separate sidebar
+- Separate permissions
+- Protected routes
+
+==================================================
+PUBLIC WEBSITE PAGES
+==================================================
+
+Create a modern landing website with these pages:
+
+1. Home Page
+Purpose:
+- Show all elections
+- Show active elections
+- Show upcoming elections
+- Show completed elections
+- Show live vote statistics
+- Show turnout percentages
+- Search and filter elections
+
+Sections:
+- Navbar
+- Hero section
+- Live election cards
+- Upcoming election cards
+- Completed election cards
+- Statistics section
+- Footer
+
+Features:
+- Countdown timer
+- Search bar
+- Filter by category
+- Responsive cards
+- Dark mode support
+
+--------------------------------------------------
+
+2. About Page
+Purpose:
+- Explain system purpose
+- Explain security and transparency
+
+Sections:
+- About project
+- Features
+- Security information
+- Team section
+
+--------------------------------------------------
+
+3. Contact Page
+Purpose:
+- Contact form
+- Support information
+
+Fields:
+- Name
+- Email
+- Message
+
+--------------------------------------------------
+
+4. Login Page
+Purpose:
+- User login
+
+Fields:
+- Email
+- Password
+
+Features:
+- Remember me
+- Forgot password
+- Role-based redirect
+- Validation
+
+--------------------------------------------------
+
+5. Signup Page
+Purpose:
+- User registration
+
+Fields:
+- Full Name
+- Email
+- Phone Number
+- Password
+- Confirm Password
+- Role Selection
+
+If Election Creator selected:
+Additional Fields:
+- Organization Name
+- Election Purpose
+
+Features:
+- Email verification
+- Validation
+- Terms checkbox
+
+--------------------------------------------------
+
+6. Forgot Password Page
+Purpose:
+- Reset password using Supabase Auth
+
+--------------------------------------------------
+
+7. Election Details Page
+Purpose:
+- Full election information
+
+Sections:
+- Election banner
+- Description
+- Start/end date
+- Registration deadline
+- Candidates list
+- Countdown timer
+- Join election button
+
+Features:
+- Candidate cards
+- Manifesto modal
+- Live vote stats
+- Share button
+
+--------------------------------------------------
+
+8. Public Results Page
+Purpose:
+- Show completed election results
+
+Features:
+- Charts
+- Winner card
+- Vote percentages
+- Turnout statistics
+
+==================================================
+SUPER ADMIN DASHBOARD
+==================================================
+
+Admin dashboard must have sidebar navigation.
+
+Admin Pages:
+
+1. Admin Dashboard Home
+Show:
+- Total users
+- Total elections
+- Active elections
+- Pending requests
+- Total votes
+- Graph analytics
+
+Widgets:
+- Bar charts
+- Pie charts
+- Recent activities
+
+--------------------------------------------------
+
+2. Election Requests Page
+Purpose:
+- Review creator requests
+
+Show:
+- Creator name
+- Email
+- Organization
+- Election purpose
+
+Actions:
+- Approve
+- Reject
+- Add rejection reason
+
+Features:
+- Search
+- Filter
+- Modal popup
+
+--------------------------------------------------
+
+3. All Elections Page
+Purpose:
+- Manage all elections
+
+Actions:
+- View
+- Suspend
+- Delete
+- Monitor live election
+
+Features:
+- Status badges
+- Search/filter
+
+--------------------------------------------------
+
+4. Users Management Page
+Purpose:
+- Manage all users
+
+Actions:
+- Block user
+- Unblock user
+- Change role
+
+Features:
+- Search users
+- Pagination
+
+--------------------------------------------------
+
+5. Audit Logs Page
+Purpose:
+- Transparency and monitoring
+
+Show:
+- Login logs
+- Voting logs
+- Approval logs
+- Override logs
+
+Features:
+- Timestamp
+- Download logs PDF
+
+--------------------------------------------------
+
+6. Notifications Page
+Purpose:
+- Send announcements
+
+--------------------------------------------------
+
+7. Settings Page
+Purpose:
+- System settings
+- Security settings
+- Email settings
+
+==================================================
+ELECTION CREATOR DASHBOARD
+==================================================
+
+Creator dashboard must have separate sidebar.
+
+Creator Pages:
+
+1. Creator Dashboard Home
+Show:
+- My elections
+- Active elections
+- Upcoming elections
+- Total voters
+- Total votes
+
+Widgets:
+- Analytics charts
+- Performance cards
+
+--------------------------------------------------
+
+2. Create Election Page
+Purpose:
+- Create new election
+
+Fields:
+- Election title
+- Description
+- Category
+- Banner image
+- Start date/time
+- End date/time
+- Registration deadline
+- Maximum voters
+
+Features:
+- Draft save
+- Validation
+
+--------------------------------------------------
+
+3. My Elections Page
+Purpose:
+- Manage elections
+
+Actions:
+- Edit
+- Publish
+- Delete
+- Start election
+- Stop election
+
+Features:
+- Election cards/table
+- Search/filter
+
+--------------------------------------------------
+
+4. Candidate Management Page
+Purpose:
+- Add/edit/delete candidates
+
+Fields:
+- Candidate photo
+- Candidate name
+- Designation
+- Manifesto
+- Description
+
+Features:
+- Image upload
+- Preview cards
+
+--------------------------------------------------
+
+5. Voters Management Page
+Purpose:
+- View registered voters
+
+Show:
+- Approved voters
+- Waitlist
+- Finalized voters
+
+Features:
+- Search voters
+- Export list
+
+--------------------------------------------------
+
+6. Finalization Page
+Purpose:
+- Lock voter list
+
+Features:
+- Freeze voter list
+- Admin override logs
+- Final voter confirmation
+
+--------------------------------------------------
+
+7. Secret ID Management Page
+Purpose:
+- Generate unique voter IDs
+
+Features:
+- Auto generate IDs
+- Email IDs
+- Resend secret IDs
+- Masked secret display
+
+--------------------------------------------------
+
+8. Live Results Page
+Purpose:
+- Monitor election results
+
+Features:
+- Real-time charts
+- Candidate vote counts
+- Winner prediction
+
+--------------------------------------------------
+
+9. Audit Logs Page
+Purpose:
+- View election-specific logs
+
+==================================================
+VOTER DASHBOARD
+==================================================
+
+Voter dashboard must have separate sidebar.
+
+Voter Pages:
+
+1. Voter Dashboard Home
+Show:
+- Joined elections
+- Voting status
+- Upcoming elections
+
+--------------------------------------------------
+
+2. Available Elections Page
+Purpose:
+- Browse elections
+
+Features:
+- Search/filter
+- Election cards
+- Countdown timers
+
+--------------------------------------------------
+
+3. My Participations Page
+Purpose:
+- View joined elections
+
+Features:
+- Participation status
+- Voting eligibility
+
+--------------------------------------------------
+
+4. Join Election Page
+Purpose:
+- Participate in election
+
+Features:
+- Terms acceptance
+- Confirmation modal
+- Eligibility check
+
+--------------------------------------------------
+
+5. Voting Page
+Purpose:
+- Cast vote securely
+
+Features:
+- Secret ID verification
+- Candidate selection
+- Vote confirmation
+- Prevent multiple votes
+
+Security:
+- One vote per voter
+- Anonymous voting
+
+--------------------------------------------------
+
+6. Results Page
+Purpose:
+- View election results
+
+Features:
+- Charts
+- Winner card
+- Percentages
+
+==================================================
+DATABASE TABLES
+==================================================
+
+Create these Supabase PostgreSQL tables:
+
+1. users
+2. election_requests
+3. elections
+4. candidates
+5. voters
+6. secret_ids
+7. votes
+8. audit_logs
+9. notifications
+
+Include:
+- Foreign keys
+- Relationships
+- Timestamps
+- Status fields
+
+==================================================
+SUPABASE FEATURES
+==================================================
+
+Implement:
+- Supabase Auth
+- Email verification
+- Forgot password
+- Row Level Security (RLS)
+- Realtime subscriptions
+- Supabase Storage for images
+- Secure APIs
+
+==================================================
+SECURITY FEATURES
+==================================================
+
+Implement:
+- Row Level Security
+- Protected routes
+- CAPTCHA
+- Rate limiting
+- Duplicate vote prevention
+- Anonymous voting
+- Input validation
+- XSS protection
+- SQL injection prevention
+- Audit logs
+
+==================================================
+FRONTEND REQUIREMENTS
+==================================================
+
+Use:
+- React.js
+- Tailwind CSS
+- React Router DOM
+- Axios or Supabase client
+- React Hook Form
+- Context API or Redux Toolkit
+
+Folder Structure:
+
+src/
+│
+├── components/
+├── pages/
+├── layouts/
+├── dashboards/
+├── routes/
+├── hooks/
+├── services/
+├── context/
+├── utils/
+├── assets/
+├── supabase/
+└── App.jsx
+
+==================================================
+UI/UX REQUIREMENTS
+==================================================
+
+Design must be:
+- Modern
+- Professional
+- Responsive
+- Mobile friendly
+- Dashboard style
+- Clean cards
+- Smooth animations
+- Dark mode support
+
+Use:
+- Tailwind CSS
+- Framer Motion
+- Recharts
+
+==================================================
+DEPLOYMENT
+==================================================
+
+Deploy:
+- Frontend on Vercel
+- Backend on Supabase
+
+Push complete code to GitHub.
+
+==================================================
+BONUS FEATURES
+==================================================
+
+Optional:
+- QR invite links
+- Download PDF results
+- SMS OTP
+- Multi-language support
+- PWA support
+- Blockchain-style logs
+- Dark mode
+
+==================================================
+FINAL REQUIREMENT
+==================================================
+
+Generate:
+- Complete frontend structure
+- Complete page hierarchy
+- Dashboard layouts
+- Component architecture
+- Database schema
+- Authentication flow
+- Routing structure
+- UI/UX layout
+- Supabase integration plan
+- Security architecture
+- Realtime live voting logic
+- Detailed project workflow
+- Responsive design structure
+```

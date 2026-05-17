@@ -3,20 +3,42 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Secure Online Election Management System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: users
+    description: User management
+  - name: elections
+    description: Election management
+  - name: candidates
+    description: Candidate management
+  - name: voters
+    description: Voter management
+  - name: votes
+    description: Voting operations
+  - name: results
+    description: Election results
+  - name: audit
+    description: Audit logs
+  - name: notifications
+    description: Notifications
+  - name: election-requests
+    description: Election creator requests
+  - name: dashboard
+    description: Dashboard summaries
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +46,895 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── AUTH ──────────────────────────────────────────────────────────────────
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      tags: [auth]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordInput"
+      responses:
+        "200":
+          description: Reset email sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/reset-password:
+    post:
+      operationId: resetPassword
+      tags: [auth]
+      summary: Reset password with token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordInput"
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ─── USERS (Admin) ─────────────────────────────────────────────────────────
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users (admin only)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user status or role (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # ─── ELECTION REQUESTS ─────────────────────────────────────────────────────
+  /election-requests:
+    get:
+      operationId: listElectionRequests
+      tags: [election-requests]
+      summary: List election creator requests (admin only)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Election requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionRequestListResponse"
+    post:
+      operationId: createElectionRequest
+      tags: [election-requests]
+      summary: Submit election creator request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElectionRequestInput"
+      responses:
+        "201":
+          description: Request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionRequest"
+
+  /election-requests/{id}:
+    get:
+      operationId: getElectionRequest
+      tags: [election-requests]
+      summary: Get election request by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Election request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionRequest"
+
+  /election-requests/{id}/approve:
+    post:
+      operationId: approveElectionRequest
+      tags: [election-requests]
+      summary: Approve election creator request (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionRequest"
+
+  /election-requests/{id}/reject:
+    post:
+      operationId: rejectElectionRequest
+      tags: [election-requests]
+      summary: Reject election creator request (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectRequestInput"
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionRequest"
+
+  # ─── ELECTIONS ─────────────────────────────────────────────────────────────
+  /elections:
+    get:
+      operationId: listElections
+      tags: [elections]
+      summary: List elections
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: creatorId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Elections list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionListResponse"
+    post:
+      operationId: createElection
+      tags: [elections]
+      summary: Create a new election (creator only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElectionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Election"
+
+  /elections/{id}:
+    get:
+      operationId: getElection
+      tags: [elections]
+      summary: Get election by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Election
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Election"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateElection
+      tags: [elections]
+      summary: Update election
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElectionUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Election"
+    delete:
+      operationId: deleteElection
+      tags: [elections]
+      summary: Delete election
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /elections/{id}/publish:
+    post:
+      operationId: publishElection
+      tags: [elections]
+      summary: Publish election
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Published
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Election"
+
+  /elections/{id}/suspend:
+    post:
+      operationId: suspendElection
+      tags: [elections]
+      summary: Suspend election (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Election"
+
+  /elections/{id}/finalize-voters:
+    post:
+      operationId: finalizeVoters
+      tags: [elections]
+      summary: Finalize voter list and lock it
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Voters finalized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ─── CANDIDATES ────────────────────────────────────────────────────────────
+  /elections/{electionId}/candidates:
+    get:
+      operationId: listCandidates
+      tags: [candidates]
+      summary: List candidates for an election
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Candidate"
+    post:
+      operationId: createCandidate
+      tags: [candidates]
+      summary: Add candidate to election
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+
+  /elections/{electionId}/candidates/{candidateId}:
+    patch:
+      operationId: updateCandidate
+      tags: [candidates]
+      summary: Update candidate
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: candidateId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+    delete:
+      operationId: deleteCandidate
+      tags: [candidates]
+      summary: Remove candidate
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: candidateId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ─── VOTERS ────────────────────────────────────────────────────────────────
+  /elections/{electionId}/voters:
+    get:
+      operationId: getElectionVoters
+      tags: [voters]
+      summary: List voters for an election
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Voters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Voter"
+    post:
+      operationId: joinElection
+      tags: [voters]
+      summary: Join an election (voter)
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Voter"
+
+  /elections/{electionId}/voters/{voterId}/approve:
+    post:
+      operationId: approveVoter
+      tags: [voters]
+      summary: Approve a voter
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: voterId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Voter"
+
+  # ─── SECRET IDs ────────────────────────────────────────────────────────────
+  /elections/{electionId}/secret-ids:
+    get:
+      operationId: listSecretIds
+      tags: [voters]
+      summary: List secret IDs for election
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Secret IDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SecretId"
+    post:
+      operationId: generateSecretIds
+      tags: [voters]
+      summary: Generate secret IDs for all finalized voters
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ─── VOTES ─────────────────────────────────────────────────────────────────
+  /elections/{electionId}/vote:
+    post:
+      operationId: castVote
+      tags: [votes]
+      summary: Cast a vote
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoteInput"
+      responses:
+        "201":
+          description: Vote cast
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Already voted or invalid secret ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /elections/{electionId}/my-vote:
+    get:
+      operationId: getMyVote
+      tags: [votes]
+      summary: Check if current user has voted
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Vote status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VoteStatus"
+
+  # ─── RESULTS ───────────────────────────────────────────────────────────────
+  /elections/{electionId}/results:
+    get:
+      operationId: getElectionResults
+      tags: [results]
+      summary: Get live/final election results
+      parameters:
+        - name: electionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Election results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionResults"
+
+  # ─── DASHBOARD ─────────────────────────────────────────────────────────────
+  /dashboard/admin:
+    get:
+      operationId: getAdminDashboard
+      tags: [dashboard]
+      summary: Admin dashboard summary
+      responses:
+        "200":
+          description: Admin dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDashboard"
+
+  /dashboard/creator:
+    get:
+      operationId: getCreatorDashboard
+      tags: [dashboard]
+      summary: Creator dashboard summary
+      responses:
+        "200":
+          description: Creator dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatorDashboard"
+
+  /dashboard/voter:
+    get:
+      operationId: getVoterDashboard
+      tags: [dashboard]
+      summary: Voter dashboard summary
+      responses:
+        "200":
+          description: Voter dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VoterDashboard"
+
+  /dashboard/public-stats:
+    get:
+      operationId: getPublicStats
+      tags: [dashboard]
+      summary: Public election statistics
+      responses:
+        "200":
+          description: Public stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicStats"
+
+  # ─── AUDIT LOGS ────────────────────────────────────────────────────────────
+  /audit-logs:
+    get:
+      operationId: listAuditLogs
+      tags: [audit]
+      summary: List audit logs
+      parameters:
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: integer
+        - name: electionId
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLogListResponse"
+
+  # ─── NOTIFICATIONS ─────────────────────────────────────────────────────────
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List notifications
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+    post:
+      operationId: createNotification
+      tags: [notifications]
+      summary: Create/send a notification (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +945,626 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    # ─── AUTH ────────────────────────────────────────────────────────────────
+    RegisterInput:
+      type: object
+      required: [fullName, email, password, role]
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: ["string", "null"]
+        password:
+          type: string
+          minLength: 8
+        role:
+          type: string
+          enum: [voter, election_creator]
+        orgName:
+          type: ["string", "null"]
+        electionPurpose:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    ForgotPasswordInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    ResetPasswordInput:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+          minLength: 8
+
+    AuthResponse:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+
+    # ─── USER ────────────────────────────────────────────────────────────────
+    User:
+      type: object
+      required: [id, fullName, email, role, status, createdAt]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [super_admin, election_creator, voter]
+        status:
+          type: string
+          enum: [active, blocked, pending]
+        orgName:
+          type: ["string", "null"]
+        electionPurpose:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    UserUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [active, blocked]
+        role:
+          type: string
+          enum: [super_admin, election_creator, voter]
+
+    UserListResponse:
+      type: object
+      required: [users, total, page, limit]
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    # ─── ELECTION REQUESTS ───────────────────────────────────────────────────
+    ElectionRequest:
+      type: object
+      required: [id, userId, orgName, electionPurpose, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        orgName:
+          type: string
+        electionPurpose:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        rejectionReason:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+
+    ElectionRequestInput:
+      type: object
+      required: [orgName, electionPurpose]
+      properties:
+        orgName:
+          type: string
+        electionPurpose:
+          type: string
+
+    RejectRequestInput:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+
+    ElectionRequestListResponse:
+      type: object
+      required: [requests, total, page, limit]
+      properties:
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElectionRequest"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    # ─── ELECTION ────────────────────────────────────────────────────────────
+    Election:
+      type: object
+      required: [id, creatorId, title, status, createdAt]
+      properties:
+        id:
+          type: integer
+        creatorId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        bannerUrl:
+          type: ["string", "null"]
+        startDate:
+          type: ["string", "null"]
+          format: date-time
+        endDate:
+          type: ["string", "null"]
+          format: date-time
+        registrationDeadline:
+          type: ["string", "null"]
+          format: date-time
+        maxVoters:
+          type: ["integer", "null"]
+        status:
+          type: string
+          enum: [draft, published, active, completed, suspended]
+        votersFinalized:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        creator:
+          $ref: "#/components/schemas/User"
+        candidateCount:
+          type: ["integer", "null"]
+        voterCount:
+          type: ["integer", "null"]
+        voteCount:
+          type: ["integer", "null"]
+
+    ElectionInput:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        bannerUrl:
+          type: ["string", "null"]
+        startDate:
+          type: ["string", "null"]
+          format: date-time
+        endDate:
+          type: ["string", "null"]
+          format: date-time
+        registrationDeadline:
+          type: ["string", "null"]
+          format: date-time
+        maxVoters:
+          type: ["integer", "null"]
+
+    ElectionUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        bannerUrl:
+          type: ["string", "null"]
+        startDate:
+          type: ["string", "null"]
+          format: date-time
+        endDate:
+          type: ["string", "null"]
+          format: date-time
+        registrationDeadline:
+          type: ["string", "null"]
+          format: date-time
+        maxVoters:
+          type: ["integer", "null"]
+        status:
+          type: string
+          enum: [draft, published, active, completed, suspended]
+
+    ElectionListResponse:
+      type: object
+      required: [elections, total, page, limit]
+      properties:
+        elections:
+          type: array
+          items:
+            $ref: "#/components/schemas/Election"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    # ─── CANDIDATE ───────────────────────────────────────────────────────────
+    Candidate:
+      type: object
+      required: [id, electionId, name, createdAt]
+      properties:
+        id:
+          type: integer
+        electionId:
+          type: integer
+        name:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        designation:
+          type: ["string", "null"]
+        manifesto:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        voteCount:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    CandidateInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        designation:
+          type: ["string", "null"]
+        manifesto:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+
+    CandidateUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        designation:
+          type: ["string", "null"]
+        manifesto:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+
+    # ─── VOTER ───────────────────────────────────────────────────────────────
+    Voter:
+      type: object
+      required: [id, electionId, userId, status, joinedAt]
+      properties:
+        id:
+          type: integer
+        electionId:
+          type: integer
+        userId:
+          type: integer
+        status:
+          type: string
+          enum: [pending, approved, waitlisted, finalized]
+        hasVoted:
+          type: boolean
+        joinedAt:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+
+    SecretId:
+      type: object
+      required: [id, voterId, electionId, maskedSecretId, isUsed, createdAt]
+      properties:
+        id:
+          type: integer
+        voterId:
+          type: integer
+        electionId:
+          type: integer
+        maskedSecretId:
+          type: string
+        isUsed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    # ─── VOTES ───────────────────────────────────────────────────────────────
+    VoteInput:
+      type: object
+      required: [candidateId, secretId]
+      properties:
+        candidateId:
+          type: integer
+        secretId:
+          type: string
+
+    VoteStatus:
+      type: object
+      required: [hasVoted]
+      properties:
+        hasVoted:
+          type: boolean
+        votedAt:
+          type: ["string", "null"]
+          format: date-time
+
+    # ─── RESULTS ─────────────────────────────────────────────────────────────
+    CandidateResult:
+      type: object
+      required: [candidateId, name, voteCount, percentage]
+      properties:
+        candidateId:
+          type: integer
+        name:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        designation:
+          type: ["string", "null"]
+        voteCount:
+          type: integer
+        percentage:
+          type: number
+
+    ElectionResults:
+      type: object
+      required: [electionId, totalVotes, totalVoters, turnoutPercentage, candidates]
+      properties:
+        electionId:
+          type: integer
+        totalVotes:
+          type: integer
+        totalVoters:
+          type: integer
+        turnoutPercentage:
+          type: number
+        winner:
+          $ref: "#/components/schemas/CandidateResult"
+        candidates:
+          type: array
+          items:
+            $ref: "#/components/schemas/CandidateResult"
+
+    # ─── DASHBOARD ───────────────────────────────────────────────────────────
+    AdminDashboard:
+      type: object
+      required: [totalUsers, totalElections, activeElections, pendingRequests, totalVotes]
+      properties:
+        totalUsers:
+          type: integer
+        totalElections:
+          type: integer
+        activeElections:
+          type: integer
+        pendingRequests:
+          type: integer
+        totalVotes:
+          type: integer
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditLog"
+        electionsByStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusCount"
+        usersByRole:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoleCount"
+
+    CreatorDashboard:
+      type: object
+      required: [totalElections, activeElections, upcomingElections, totalVoters, totalVotes]
+      properties:
+        totalElections:
+          type: integer
+        activeElections:
+          type: integer
+        upcomingElections:
+          type: integer
+        completedElections:
+          type: integer
+        totalVoters:
+          type: integer
+        totalVotes:
+          type: integer
+        recentElections:
+          type: array
+          items:
+            $ref: "#/components/schemas/Election"
+
+    VoterDashboard:
+      type: object
+      required: [joinedElections, votedCount, upcomingElections]
+      properties:
+        joinedElections:
+          type: integer
+        votedCount:
+          type: integer
+        upcomingElections:
+          type: integer
+        participations:
+          type: array
+          items:
+            $ref: "#/components/schemas/VoterParticipation"
+
+    PublicStats:
+      type: object
+      required: [totalElections, activeElections, completedElections, totalVotes]
+      properties:
+        totalElections:
+          type: integer
+        activeElections:
+          type: integer
+        completedElections:
+          type: integer
+        upcomingElections:
+          type: integer
+        totalVotes:
+          type: integer
+        recentElections:
+          type: array
+          items:
+            $ref: "#/components/schemas/Election"
+
+    StatusCount:
+      type: object
+      required: [status, count]
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+
+    RoleCount:
+      type: object
+      required: [role, count]
+      properties:
+        role:
+          type: string
+        count:
+          type: integer
+
+    VoterParticipation:
+      type: object
+      required: [election, voter]
+      properties:
+        election:
+          $ref: "#/components/schemas/Election"
+        voter:
+          $ref: "#/components/schemas/Voter"
+
+    # ─── AUDIT LOGS ──────────────────────────────────────────────────────────
+    AuditLog:
+      type: object
+      required: [id, action, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: ["integer", "null"]
+        action:
+          type: string
+        entityType:
+          type: ["string", "null"]
+        entityId:
+          type: ["integer", "null"]
+        details:
+          type: ["string", "null"]
+        ipAddress:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+
+    AuditLogListResponse:
+      type: object
+      required: [logs, total, page, limit]
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditLog"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    # ─── NOTIFICATIONS ───────────────────────────────────────────────────────
+    Notification:
+      type: object
+      required: [id, title, message, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        targetRole:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    NotificationInput:
+      type: object
+      required: [title, message]
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        targetRole:
+          type: ["string", "null"]
