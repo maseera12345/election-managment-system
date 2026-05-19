@@ -46,13 +46,20 @@ const queryClient = new QueryClient({
   },
 });
 
-// Helper wrapper for protected routes (IMPORTANT FIX)
-const Protected = (Component: any, roles: string[]) => {
-  return () => (
-    <ProtectedRoute allowedRoles={roles}>
-      <Component />
-    </ProtectedRoute>
-  );
+/**
+ * SAFE Protected Route Wrapper (FIXED for Vercel TS)
+ */
+const Protected = (
+  Component: React.ComponentType,
+  roles: string[]
+) => {
+  return function ProtectedWrapper() {
+    return (
+      <ProtectedRoute allowedRoles={roles}>
+        <Component />
+      </ProtectedRoute>
+    );
+  };
 };
 
 function AppRouter() {
