@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -33,19 +33,18 @@ import JoinElection from "@/pages/voter/JoinElection";
 import VoteElection from "@/pages/voter/VoteElection";
 
 import ElectionResults from "@/pages/shared/ElectionResults";
-
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: 1, staleTime: 30_000 },
+    queries: { retry: 1, staleTime: 30000 },
   },
 });
 
-function Router() {
+function AppRouter() {
   return (
-    <Switch>
-      {/* Public */}
+    <>
+      {/* PUBLIC ROUTES */}
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
@@ -53,74 +52,192 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/elections/:id" component={ElectionDetail} />
 
-      {/* Admin */}
-      <Route path="/admin">
-        {() => <ProtectedRoute allowedRoles={["super_admin"]}><AdminDashboard /></ProtectedRoute>}
-      </Route>
-      <Route path="/admin/requests">
-        {() => <ProtectedRoute allowedRoles={["super_admin"]}><AdminRequests /></ProtectedRoute>}
-      </Route>
-      <Route path="/admin/elections">
-        {() => <ProtectedRoute allowedRoles={["super_admin"]}><AdminElections /></ProtectedRoute>}
-      </Route>
-      <Route path="/admin/elections/:id/results">
-        {() => <ProtectedRoute allowedRoles={["super_admin"]}><ElectionResults /></ProtectedRoute>}
-      </Route>
-      <Route path="/admin/users">
-        {() => <ProtectedRoute allowedRoles={["super_admin"]}><AdminUsers /></ProtectedRoute>}
-      </Route>
-      <Route path="/admin/audit-logs">
-        {() => <ProtectedRoute allowedRoles={["super_admin"]}><AdminAuditLogs /></ProtectedRoute>}
-      </Route>
-      <Route path="/admin/notifications">
-        {() => <ProtectedRoute allowedRoles={["super_admin"]}><AdminNotifications /></ProtectedRoute>}
-      </Route>
+      {/* ADMIN ROUTES */}
+      <Route
+        path="/admin"
+        component={() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        )}
+      />
 
-      {/* Creator */}
-      <Route path="/creator">
-        {() => <ProtectedRoute allowedRoles={["election_creator"]}><CreatorDashboard /></ProtectedRoute>}
-      </Route>
-      <Route path="/creator/create">
-        {() => <ProtectedRoute allowedRoles={["election_creator"]}><CreateElection /></ProtectedRoute>}
-      </Route>
-      <Route path="/creator/elections">
-        {() => <ProtectedRoute allowedRoles={["election_creator"]}><CreatorElections /></ProtectedRoute>}
-      </Route>
-      <Route path="/creator/elections/:id/edit">
-        {() => <ProtectedRoute allowedRoles={["election_creator"]}><EditElection /></ProtectedRoute>}
-      </Route>
-      <Route path="/creator/elections/:id/candidates">
-        {() => <ProtectedRoute allowedRoles={["election_creator"]}><CreatorCandidates /></ProtectedRoute>}
-      </Route>
-      <Route path="/creator/elections/:id/voters">
-        {() => <ProtectedRoute allowedRoles={["election_creator"]}><ManageVoters /></ProtectedRoute>}
-      </Route>
-      <Route path="/creator/elections/:id/results">
-        {() => <ProtectedRoute allowedRoles={["election_creator"]}><ElectionResults /></ProtectedRoute>}
-      </Route>
+      <Route
+        path="/admin/requests"
+        component={() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <AdminRequests />
+          </ProtectedRoute>
+        )}
+      />
 
-      {/* Voter */}
-      <Route path="/voter">
-        {() => <ProtectedRoute allowedRoles={["voter"]}><VoterDashboard /></ProtectedRoute>}
-      </Route>
-      <Route path="/voter/elections">
-        {() => <ProtectedRoute allowedRoles={["voter"]}><VoterElections /></ProtectedRoute>}
-      </Route>
-      <Route path="/voter/participations">
-        {() => <ProtectedRoute allowedRoles={["voter"]}><VoterParticipations /></ProtectedRoute>}
-      </Route>
-      <Route path="/voter/elections/:id/join">
-        {() => <ProtectedRoute allowedRoles={["voter"]}><JoinElection /></ProtectedRoute>}
-      </Route>
-      <Route path="/voter/elections/:id/vote">
-        {() => <ProtectedRoute allowedRoles={["voter"]}><VoteElection /></ProtectedRoute>}
-      </Route>
-      <Route path="/voter/elections/:id/results">
-        {() => <ProtectedRoute allowedRoles={["voter"]}><ElectionResults /></ProtectedRoute>}
-      </Route>
+      <Route
+        path="/admin/elections"
+        component={() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <AdminElections />
+          </ProtectedRoute>
+        )}
+      />
 
+      <Route
+        path="/admin/elections/:id/results"
+        component={() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <ElectionResults />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/admin/users"
+        component={() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <AdminUsers />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/admin/audit-logs"
+        component={() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <AdminAuditLogs />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/admin/notifications"
+        component={() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <AdminNotifications />
+          </ProtectedRoute>
+        )}
+      />
+
+      {/* CREATOR ROUTES */}
+      <Route
+        path="/creator"
+        component={() => (
+          <ProtectedRoute allowedRoles={["election_creator"]}>
+            <CreatorDashboard />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/creator/create"
+        component={() => (
+          <ProtectedRoute allowedRoles={["election_creator"]}>
+            <CreateElection />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/creator/elections"
+        component={() => (
+          <ProtectedRoute allowedRoles={["election_creator"]}>
+            <CreatorElections />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/creator/elections/:id/edit"
+        component={() => (
+          <ProtectedRoute allowedRoles={["election_creator"]}>
+            <EditElection />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/creator/elections/:id/candidates"
+        component={() => (
+          <ProtectedRoute allowedRoles={["election_creator"]}>
+            <CreatorCandidates />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/creator/elections/:id/voters"
+        component={() => (
+          <ProtectedRoute allowedRoles={["election_creator"]}>
+            <ManageVoters />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/creator/elections/:id/results"
+        component={() => (
+          <ProtectedRoute allowedRoles={["election_creator"]}>
+            <ElectionResults />
+          </ProtectedRoute>
+        )}
+      />
+
+      {/* VOTER ROUTES */}
+      <Route
+        path="/voter"
+        component={() => (
+          <ProtectedRoute allowedRoles={["voter"]}>
+            <VoterDashboard />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/voter/elections"
+        component={() => (
+          <ProtectedRoute allowedRoles={["voter"]}>
+            <VoterElections />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/voter/participations"
+        component={() => (
+          <ProtectedRoute allowedRoles={["voter"]}>
+            <VoterParticipations />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/voter/elections/:id/join"
+        component={() => (
+          <ProtectedRoute allowedRoles={["voter"]}>
+            <JoinElection />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/voter/elections/:id/vote"
+        component={() => (
+          <ProtectedRoute allowedRoles={["voter"]}>
+            <VoteElection />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/voter/elections/:id/results"
+        component={() => (
+          <ProtectedRoute allowedRoles={["voter"]}>
+            <ElectionResults />
+          </ProtectedRoute>
+        )}
+      />
+
+      {/* 404 */}
       <Route component={NotFound} />
-    </Switch>
+    </>
   );
 }
 
@@ -130,7 +247,7 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
+            <AppRouter />
           </WouterRouter>
           <Toaster />
         </TooltipProvider>
