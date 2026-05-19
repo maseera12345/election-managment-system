@@ -5,7 +5,7 @@ A full-stack Secure Online Election Management System developed using **React/An
 This platform provides secure, transparent, and anonymous online voting with role-based access control, live results, audit logs, and election management features.
 
 ---
-
+live project :https://secure-finance-hub--maseeraaa.replit.app/
 # 📌 Project Objective
 
 The objective of this project is to create a secure online election platform where:
