@@ -89,6 +89,11 @@ export default function CreatorElections() {
                   )}
                 </CardContent>
                 <CardFooter className="pt-4 border-t gap-2 flex-wrap">
+                  {(election.status === "draft" || election.status === "published") && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/creator/elections/${election.id}/edit`}>Edit</Link>
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/creator/elections/${election.id}/candidates`}>Candidates</Link>
                   </Button>

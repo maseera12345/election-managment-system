@@ -15,7 +15,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, FileText, Archive, Vote, LogOut, ClipboardList, Bell } from "lucide-react";
+import {
+  LayoutDashboard, Users, FileText, Archive, Vote,
+  LogOut, ClipboardList, Bell, PlusCircle, UserCheck, BarChart2
+} from "lucide-react";
 import { useLogout } from "@workspace/api-client-react";
 import { toast } from "sonner";
 
@@ -27,17 +30,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
-      logout();
-      setLocation("/");
-      toast.success("Logged out successfully");
-    } catch (e) {
-      logout();
-      setLocation("/");
-    }
+    } catch {}
+    logout();
+    setLocation("/");
+    toast.success("Logged out successfully");
   };
 
   const superAdminNav = [
     { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+    { title: "Election Requests", url: "/admin/requests", icon: UserCheck },
     { title: "All Elections", url: "/admin/elections", icon: Archive },
     { title: "Users", url: "/admin/users", icon: Users },
     { title: "Audit Logs", url: "/admin/audit-logs", icon: ClipboardList },
@@ -47,15 +48,22 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const creatorNav = [
     { title: "Dashboard", url: "/creator", icon: LayoutDashboard },
     { title: "My Elections", url: "/creator/elections", icon: Archive },
-    { title: "Create Election", url: "/creator/create", icon: FileText },
+    { title: "Create Election", url: "/creator/create", icon: PlusCircle },
   ];
 
   const voterNav = [
     { title: "Dashboard", url: "/voter", icon: LayoutDashboard },
     { title: "Browse Elections", url: "/voter/elections", icon: Archive },
+    { title: "My Participations", url: "/voter/participations", icon: Vote },
   ];
 
   const navItems = role === "super_admin" ? superAdminNav : role === "election_creator" ? creatorNav : voterNav;
+
+  const isActive = (url: string) => {
+    const roots = ["/admin", "/creator", "/voter"];
+    if (roots.includes(url)) return location === url;
+    return location.startsWith(url);
+  };
 
   return (
     <SidebarProvider>
@@ -74,7 +82,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <SidebarMenu>
                   {navItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild isActive={location === item.url || (item.url !== "/admin" && item.url !== "/creator" && item.url !== "/voter" && location.startsWith(item.url))}>
+                      <SidebarMenuButton asChild isActive={isActive(item.url)}>
                         <Link href={item.url} className="flex items-center gap-2">
                           <item.icon className="h-4 w-4" />
                           <span>{item.title}</span>
@@ -90,7 +98,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium">{user?.fullName}</span>
-                <span className="text-xs text-muted-foreground capitalize">{role?.replace("_", " ")}</span>
+                <span className="text-xs text-muted-foreground capitalize">{role?.replace(/_/g, " ")}</span>
               </div>
               <Button variant="outline" className="w-full justify-start gap-2" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
@@ -102,8 +110,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col">
           <header className="h-16 border-b flex items-center px-6 bg-background sticky top-0 z-10">
             <SidebarTrigger />
-            <div className="ml-auto flex items-center gap-4">
-              {/* Top right header content if needed */}
+            <div className="ml-4 flex items-center gap-2">
+              <Link href="/" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                ← Public Site
+              </Link>
             </div>
           </header>
           <main className="flex-1 p-6 overflow-auto bg-muted/20">
