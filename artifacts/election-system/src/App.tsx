@@ -14,6 +14,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminElections from "@/pages/admin/AdminElections";
 import AdminAuditLogs from "@/pages/admin/AdminAuditLogs";
+import AdminNotifications from "@/pages/admin/AdminNotifications";
 
 import CreatorDashboard from "@/pages/creator/CreatorDashboard";
 import CreateElection from "@/pages/creator/CreateElection";
@@ -80,6 +81,13 @@ function Router() {
         {() => (
           <ProtectedRoute allowedRoles={["super_admin"]}>
             <AdminAuditLogs />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/admin/notifications">
+        {() => (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <AdminNotifications />
           </ProtectedRoute>
         )}
       </Route>

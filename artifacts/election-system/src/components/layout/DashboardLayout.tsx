@@ -15,7 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, FileText, Settings, Bell, Archive, Vote, LogOut, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Archive, Vote, LogOut, ClipboardList, Bell } from "lucide-react";
 import { useLogout } from "@workspace/api-client-react";
 import { toast } from "sonner";
 
@@ -41,6 +41,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     { title: "All Elections", url: "/admin/elections", icon: Archive },
     { title: "Users", url: "/admin/users", icon: Users },
     { title: "Audit Logs", url: "/admin/audit-logs", icon: ClipboardList },
+    { title: "Notifications", url: "/admin/notifications", icon: Bell },
   ];
 
   const creatorNav = [
